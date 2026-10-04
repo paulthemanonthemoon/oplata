@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Приложение оплаты</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f4f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; 
+            padding: 0;
+            color: #1d1d1f;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 440px;
+            min-height: 100vh;
+            background: #ffffff;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Все кликабельные элементы */
+        button, #sberDiv, #tbankDiv, .tb-act-btn {
+            cursor: pointer;
+            touch-action: manipulation;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- СТРАНИЦА 1: СКАНЕР --- */
+        #step-1 {
+            background-color: #020617;
+            color: white;
+            padding: 24px;
+            justify-content: space-between;
+        }
+
+        .scan-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+        }
+
+        .scan-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .red-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .flash-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(30, 41, 59, 0.8);
+            border: none;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flash-btn.active {
+            background: #facc15;
+            color: #020617;
+        }
+
+        .scanner-box {
+            width: 256px;
+            height: 256px;
+            border: 2px dashed rgba(52, 211, 153, 0.5);
+            border-radius: 24px;
+            position: relative;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            overflow: hidden;
+        }
+
+        .corner {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-color: #34d399;
+        }
+        .corner-tl { top: 0; left: 0; border-top: 4px solid; border-left: 4px solid; border-top-left-radius: 12px; }
+        .corner-tr { top: 0; right: 0; border-top: 4px solid; border-right: 4px solid; border-top-right-radius: 12px; }
+        .corner-bl { bottom: 0; left: 0; border-bottom: 4px solid; border-left: 4px solid; border-bottom-left-radius: 12px; }
+        .corner-br { bottom: 0; right: 0; border-bottom: 4px solid; border-right: 4px solid; border-bottom-right-radius: 12px; }
+
+        .scan-laser {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #34d399, transparent);
+            box-shadow: 0 0 15px #34d399;
+            animation: scanLaser 2.2s infinite ease-in-out;
+        }
+
+        @keyframes scanLaser {
+            0% { top: 10%; opacity: 0.8; }
+            50% { top: 85%; opacity: 1; }
+            100% { top: 10%; opacity: 0.8; }
+        }
+
+        .btn-green {
+            width: 100%;
+            padding: 16px;
+            background-color: #10b981;
+            color: #020617;
+            font-weight: 700;
+            border-radius: 16px;
+            border: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* --- СТРАНИЦА 2: ВЫБОР БАНКА --- */
+        #step-2 {
+            background-color: #f1f5f9;
+            padding: 16px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #choicePay {
+            width: 100%;
+            max-width: 500px; 
+            padding-bottom: 30px; 
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .user-h1 {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 25px;
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        #containerDivChoice {
+            display: flex;
+            justify-content: center;
+            gap: 30px;  
+            padding: 0 20px;
+        }
+
+        #textPay {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 14px;
+            color: #374151;
+            pointer-events: none;
+        }
+
+        #sberDiv, #tbankDiv {
+            text-align: center;
+            flex: 1;
+            padding: 20px 10px;
+            border-radius: 16px;
+            border: 2px solid #f3f4f6;
+            background: #fafafa;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #sberDiv *, #tbankDiv * {
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            #choicePay {
+                width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                justify-content: center;
+            }
+
+            #containerDivChoice {
+                flex-direction: column; 
+                gap: 16px; 
+            }
+
+            #sberDiv, #tbankDiv {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 20px;
+                text-align: left;
+            }
+
+            #sberDiv #textPay, #tbankDiv #textPay {
+                margin-top: 0;
+            }
+        }
+
+        /* --- СТРАНИЦА 3: ВВОД ДАННЫХ --- */
+        #step-3 {
+            background-color: #f8fafc;
+            padding: 24px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .field-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .field-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            outline: none;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-dark {
+            width: 100%;
+            padding: 16px;
+            background: #0f172a;
+            color: white;
+            font-weight: 700;
+            border-radius: 16px;
+            border: none;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* --- СТРАНИЦА 4: ЧЕК Т-БАНКА --- */
+        #step-tbank-receipt {
+            background: #f6f7f9;
+        }
+
+        .tb-header {
+            padding: 12px 24px 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+        }
+
+        .tb-card-main {
+            background: white;
+            padding: 16px 24px 32px;
+            border-bottom-left-radius: 32px;
+            border-bottom-right-radius: 32px;
+            text-align: center;
+            position: relative;
+        }
+
+        .tb-badge {
+            background: #ffdd2d;
+            color: black;
+            font-weight: 900;
+            padding: 2px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+
+        .tb-amount {
+            font-size: 32px;
+            font-weight: 800;
+            margin-top: 12px;
+        }
+
+        .tb-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .tb-act-btn {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .tb-icon-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #eff6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tb-block {
+            background: white;
+            margin: 0 16px 16px;
+            padding: 16px;
+            border-radius: 16px;
+        }
+
+        /* --- СТРАНИЦА 5: ЧЕК СБЕРА --- */
+        #step-sber-receipt {
+            background: #f0f4f1;
+            padding: 16px;
+        }
+
+        .sber-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid #dcfce7;
+            position: relative;
+        }
+
+        .sber-check {
+            width: 64px;
+            height: 64px;
+            background: #dcfce7;
+            color: #16a34a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px auto 12px;
+        }
+
+        .sber-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- ================= ШАГ 1: СКАНЕР ================= -->
+        <div id="step-1" class="screen active">
+            <div class="scan-top">
+                <div class="scan-status">
+                    <div class="red-dot"></div>
+                    <span style="font-size: 12px; font-family: monospace; color: #94a3b8; text-transform: uppercase;">Сканирование</span>
+                </div>
+                <button onclick="toggleFlash()" id="flash-btn" class="flash-btn" type="button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                </button>
+            </div>
+
+            <div style="margin: auto 0; text-align: center;">
+                <div class="scanner-box">
+                    <div class="corner corner-tl"></div>
+                    <div class="corner corner-tr"></div>
+                    <div class="corner corner-bl"></div>
+                    <div class="corner corner-br"></div>
+                    <div class="scan-laser"></div>
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </div>
+                <p style="color: #94a3b8; font-size: 14px; margin-top: 24px;">Наведите камеру на QR-код для сканирования</p>
+            </div>
+
+            <button onclick="goToStep(2)" class="btn-green" type="button">
+                <span>Продолжить</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </div>
+
+        <!-- ================= ШАГ 2: ВЫБОР СПОСОБА ОПЛАТЫ ================= -->
+        <div id="step-2" class="screen">
+            <div id="choicePay">
+                <span>
+                    <h1 class="user-h1">Выберите способ оплаты:</h1>
+                </span>
+                <div id="containerDivChoice">
+                    <div id="sberDiv" onclick="selectBank('sber')">
+                        <div style="width: 48px; height: 48px; margin: 0 auto;">
+                            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="50" r="45" fill="#21A038"/>
+                                <path d="M50 22L70 42L60 52L50 42L32 60L22 50L50 22Z" fill="white"/>
+                                <circle cx="50" cy="50" r="10" fill="#FFD700"/>
+                            </svg>
+                        </div>
+                        <h2 id="textPay">Сбер</h2>
+                    </div>
+
+                    <div id="tbankDiv" onclick="selectBank('tbank')">
+                        <div style="width: 48px; height: 48px; background: #FFDD2D; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <span style="font-weight: 900; font-size: 24px; color: black;">Т</span>
+                        </div>
+                        <h2 id="textPay">ТБанк</h2>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px; text-align: center;">
+                    <button onclick="goToStep(1)" style="border: none; background: none; color: #94a3b8; font-size: 14px;" type="button">
+                        ← Назад к сканеру
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ШАГ 3: ДЕТАЛИ ОПЕРАЦИИ ================= -->
+        <div id="step-3" class="screen">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <button onclick="goToStep(2)" style="width: 36px; height: 36px; border-radius: 50%; background: white; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" type="button">←</button>
+                <h2 style="font-size: 18px; font-weight: 700;" id="form-bank-title">Детали операции</h2>
+                <div style="width: 36px;"></div>
+            </div>
+
+            <div class="form-card">
+                <div id="selected-bank-badge" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 16px;"></div>
+
+                <div class="field-group">
+                    <label>Магазин / Сервис</label>
+                    <input type="text" id="input-merchant" value="Транспорт">
+                </div>
+
+                <div class="grid-2">
+                    <div class="field-group">
+                        <label>Категория</label>
+                        <input type="text" id="input-category" value="Транспорт">
+                    </div>
+                    <div class="field-group">
+                        <label>MCC код</label>
+                        <input type="text" id="input-mcc" value="4111">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Сумма (₽)</label>
+                    <input type="number" step="0.01" id="input-amount" value="44.00" style="font-size: 20px; font-weight: 700;">
+                </div>
+
+                <div class="grid-2">
+                    <div class="field-group">
+                        <label>Дата</label>
+                        <input type="date" id="input-date">
+                    </div>
+                    <div class="field-group">
+                        <label>Время</label>
+                        <input type="time" id="input-time">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Карта (*4 цифры)</label>
+                    <input type="text" id="input-card" maxlength="4" value="6449">
+                </div>
+
+                <button onclick="generateReceipt()" class="btn-dark" type="button">Показать чек</button>
+            </div>
+        </div>
+
+        <!-- ================= ШАГ 4: ЧЕК Т-БАНКА ================= -->
+        <div id="step-tbank-receipt" class="screen">
+            <div class="tb-header">
+                <div class="tb-badge">Т-БАНК</div>
+            </div>
+
+            <div style="flex: 1; overflow-y: auto;">
+                <div class="tb-card-main">
+                    <button onclick="goToStep(3)" style="position: absolute; right: 20px; top: 16px; border: none; background: #f1f5f9; width: 32px; height: 32px; border-radius: 50%; font-size: 16px;" type="button">✕</button>
+                    
+                    <div id="tb-display-datetime" style="color: #64748b; font-size: 14px;">30 сентября • 19:22</div>
+                    
+                    <div style="width: 80px; height: 80px; background: #E51937; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 20px auto 12px;">
+                        <span id="tb-merchant-logo" style="color: white; font-size: 36px; font-weight: 900; font-style: italic;">Т</span>
+                    </div>
+
+                    <div id="tb-display-merchant" style="font-size: 20px; font-weight: 700;">Транспорт</div>
+                    <div id="tb-display-category-mcc" style="color: #64748b; font-size: 14px; margin-top: 4px;">🚗 Транспорт • MCC 4111</div>
+                    <div id="tb-display-amount" class="tb-amount">-44,00 ₽</div>
+                    <div style="color: #94a3b8; font-size: 12px; margin-top: 8px;">⏱ Обрабатываем операцию</div>
+                </div>
+
+                <div class="tb-actions">
+                    <div class="tb-act-btn">
+                        <div class="tb-icon-circle">🚫</div>
+                        <span>Не учитывать</span>
+                    </div>
+                    <div class="tb-act-btn">
+                        <div class="tb-icon-circle">⚖️</div>
+                        <span>Оспорить</span>
+                    </div>
+                    <div class="tb-act-btn">
+                        <div class="tb-icon-circle">🧩</div>
+                        <span>Разделить</span>
+                    </div>
+                </div>
+
+                <div class="tb-block">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                        <span style="font-weight: 700;">Покупка по карте</span>
+                        <span style="color: #2563eb; font-size: 14px; font-weight: 600;">Справка</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 48px; height: 32px; background: #18181b; border-radius: 6px; padding: 4px; color: white; font-size: 8px; display: flex; flex-direction: column; justify-content: space-between;">
+                            <span id="tb-card-last4">6449</span>
+                            <span style="color: #facc15; font-weight: 700;">VISA</span>
+                        </div>
+                        <span style="font-weight: 600; font-size: 14px;">Дебетовая карта</span>
+                    </div>
+                </div>
+
+                <div class="tb-block">
+                    <span style="font-weight: 700; display: block; margin-bottom: 4px;">Чек за покупку</span>
+                    <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">Добавьте чек — если в нем есть товары по акциям, начислим за них кэшбэк</p>
+                    <button style="width: 100%; padding: 12px; background: #eff6ff; color: #2563eb; font-weight: 700; border: none; border-radius: 12px;" type="button">+ Добавить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ШАГ 5: ЧЕК СБЕРА ================= -->
+        <div id="step-sber-receipt" class="screen">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                <span id="sb-status-time" style="font-size: 12px; font-weight: 600;">19:35</span>
+                <span style="color: #16a34a; font-weight: 700; font-size: 12px;">● СберБанк</span>
+            </div>
+
+            <div class="sber-card">
+                <button onclick="goToStep(3)" style="position: absolute; right: 16px; top: 16px; border: none; background: #f1f5f9; width: 32px; height: 32px; border-radius: 50%; font-size: 16px;" type="button">✕</button>
+
+                <div class="sber-check">✓</div>
+                <div style="font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase;">Оплата выполнена</div>
+                <div id="sb-display-amount" style="font-size: 32px; font-weight: 800; margin: 8px 0;">44,00 ₽</div>
+                <div id="sb-display-merchant" style="font-weight: 600;">Транспорт</div>
+                <div id="sb-display-datetime" style="font-size: 12px; color: #94a3b8; margin-top: 4px;">30 сентября 2026, 19:22</div>
+
+                <hr style="border: none; border-top: 1px dashed #e2e8f0; margin: 20px 0;">
+
+                <div class="sber-row">
+                    <span style="color: #94a3b8;">Статус</span>
+                    <span style="color: #16a34a; font-weight: 600;">Исполнено</span>
+                </div>
+                <div class="sber-row">
+                    <span style="color: #94a3b8;">Счет списания</span>
+                    <span id="sb-display-card" style="font-weight: 600;">• 6449</span>
+                </div>
+                <div class="sber-row">
+                    <span style="color: #94a3b8;">Категория</span>
+                    <span id="sb-display-category" style="font-weight: 600;">Транспорт</span>
+                </div>
+                <div class="sber-row">
+                    <span style="color: #94a3b8;">Комиссия</span>
+                    <span style="font-weight: 600;">0,00 ₽</span>
+                </div>
+
+                <button style="width: 100%; padding: 14px; background: #16a34a; color: white; font-weight: 700; border-radius: 16px; border: none; margin-top: 16px;" type="button">Сохранить чек</button>
+            </div>
+
+            <button onclick="goToStep(3)" style="width: 100%; padding: 12px; border: none; background: none; color: #64748b; font-size: 14px; margin-top: 12px;" type="button">Изменить данные</button>
+        </div>
+
+    </div>
+
+    <script>
+        let selectedBank = 'tbank';
+
+        window.onload = function() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            document.getElementById('input-date').value = `${year}-${month}-${day}`;
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('input-time').value = `${hours}:${minutes}`;
+        };
+
+        function goToStep(stepNumber) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+
+            if (stepNumber === 1) document.getElementById('step-1').classList.add('active');
+            else if (stepNumber === 2) document.getElementById('step-2').classList.add('active');
+            else if (stepNumber === 3) {
+                document.getElementById('step-3').classList.add('active');
+                updateSelectedBankBadge();
+            }
+            else if (stepNumber === 'tbank') document.getElementById('step-tbank-receipt').classList.add('active');
+            else if (stepNumber === 'sber') document.getElementById('step-sber-receipt').classList.add('active');
+        }
+
+        function toggleFlash() {
+            document.getElementById('flash-btn').classList.toggle('active');
+        }
+
+        function selectBank(bank) {
+            selectedBank = bank;
+            goToStep(3);
+        }
+
+        function updateSelectedBankBadge() {
+            const container = document.getElementById('selected-bank-badge');
+            const title = document.getElementById('form-bank-title');
+
+            if (selectedBank === 'tbank') {
+                title.innerText = "Чек Т-Банка";
+                container.innerHTML = `
+                    <div style="width:32px; height:32px; background:#FFDD2D; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:900; color:black;">Т</div>
+                    <div>
+                        <div style="font-weight:700; font-size:14px;">Т-Банк</div>
+                        <div style="font-size:12px; color:#94a3b8;">Формат мобильного чека</div>
+                    </div>
+                `;
+            } else {
+                title.innerText = "Чек СберБанка";
+                container.innerHTML = `
+                    <div style="width:32px; height:32px; background:#21A038; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:700; color:white;">✓</div>
+                    <div>
+                        <div style="font-weight:700; font-size:14px;">СберБанк</div>
+                        <div style="font-size:12px; color:#94a3b8;">Формат мобильной операции</div>
+                    </div>
+                `;
+            }
+        }
+
+        const monthsRu = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+        function generateReceipt() {
+            const merchant = document.getElementById('input-merchant').value || 'Транспорт';
+            const category = document.getElementById('input-category').value || 'Транспорт';
+            const mcc = document.getElementById('input-mcc').value || '4111';
+            const rawAmount = parseFloat(document.getElementById('input-amount').value || 44);
+            const dateVal = document.getElementById('input-date').value;
+            const timeVal = document.getElementById('input-time').value || '12:00';
+            const cardDigits = document.getElementById('input-card').value || '6449';
+
+            const formattedAmount = rawAmount.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
+            const dateObj = new Date(dateVal);
+            const day = dateObj.getDate();
+            const monthName = monthsRu[dateObj.getMonth()];
+            const year = dateObj.getFullYear();
+
+            if (selectedBank === 'tbank') {
+                document.getElementById('tb-display-datetime').innerText = `${day} ${monthName} • ${timeVal}`;
+                document.getElementById('tb-display-merchant').innerText = merchant;
+                document.getElementById('tb-merchant-logo').innerText = merchant.trim().charAt(0).toUpperCase();
+                document.getElementById('tb-display-category-mcc').innerText = `🚗 ${category} • MCC ${mcc}`;
+                document.getElementById('tb-display-amount').innerText = `-${formattedAmount} ₽`;
+                document.getElementById('tb-card-last4').innerText = cardDigits;
+
+                goToStep('tbank');
+            } else {
+                document.getElementById('sb-status-time').innerText = timeVal;
+                document.getElementById('sb-display-datetime').innerText = `${day} ${monthName} ${year}, ${timeVal}`;
+                document.getElementById('sb-display-merchant').innerText = merchant;
+                document.getElementById('sb-display-amount').innerText = `${formattedAmount} ₽`;
+                document.getElementById('sb-display-card').innerText = `• ${cardDigits}`;
+                document.getElementById('sb-display-category').innerText = category;
+
+                goToStep('sber');
+            }
+        }
+    </script>
+</body>
+</html>

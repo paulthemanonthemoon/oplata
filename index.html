@@ -54,114 +54,6 @@
             z-index: 10;
         }
 
-        /* --- СТРАНИЦА 1: СКАНЕР --- */
-        #step-1 {
-            background-color: #020617;
-            color: white;
-            padding: 24px;
-            justify-content: space-between;
-        }
-
-        .scan-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 16px;
-        }
-
-        .scan-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .red-dot {
-            width: 12px;
-            height: 12px;
-            background-color: #ef4444;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .flash-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(30, 41, 59, 0.8);
-            border: none;
-            color: #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .flash-btn.active {
-            background: #facc15;
-            color: #020617;
-        }
-
-        .scanner-box {
-            width: 256px;
-            height: 256px;
-            border: 2px dashed rgba(52, 211, 153, 0.5);
-            border-radius: 24px;
-            position: relative;
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-            overflow: hidden;
-        }
-
-        .corner {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            border-color: #34d399;
-        }
-        .corner-tl { top: 0; left: 0; border-top: 4px solid; border-left: 4px solid; border-top-left-radius: 12px; }
-        .corner-tr { top: 0; right: 0; border-top: 4px solid; border-right: 4px solid; border-top-right-radius: 12px; }
-        .corner-bl { bottom: 0; left: 0; border-bottom: 4px solid; border-left: 4px solid; border-bottom-left-radius: 12px; }
-        .corner-br { bottom: 0; right: 0; border-bottom: 4px solid; border-right: 4px solid; border-bottom-right-radius: 12px; }
-
-        .scan-laser {
-            position: absolute;
-            left: 12px;
-            right: 12px;
-            height: 2px;
-            background: linear-gradient(to right, transparent, #34d399, transparent);
-            box-shadow: 0 0 15px #34d399;
-            animation: scanLaser 2.2s infinite ease-in-out;
-        }
-
-        @keyframes scanLaser {
-            0% { top: 10%; opacity: 0.8; }
-            50% { top: 85%; opacity: 1; }
-            100% { top: 10%; opacity: 0.8; }
-        }
-
-        .btn-green {
-            width: 100%;
-            padding: 16px;
-            background-color: #10b981;
-            color: #020617;
-            font-weight: 700;
-            border-radius: 16px;
-            border: none;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
         /* --- СТРАНИЦА 2: ВЫБОР БАНКА --- */
         #step-2 {
             background-color: #f1f5f9;
@@ -308,14 +200,6 @@
             background: #f6f7f9;
         }
 
-        .tb-header {
-            padding: 12px 24px 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: white;
-        }
-
         .tb-card-main {
             background: white;
             padding: 16px 24px 32px;
@@ -323,15 +207,6 @@
             border-bottom-right-radius: 32px;
             text-align: center;
             position: relative;
-        }
-
-        .tb-badge {
-            background: #ffdd2d;
-            color: black;
-            font-weight: 900;
-            padding: 2px 12px;
-            border-radius: 999px;
-            font-size: 11px;
         }
 
         .tb-amount {
@@ -416,38 +291,8 @@
 
     <div id="app">
 
-        <!-- ================= ШАГ 1: СКАНЕР ================= -->
-        <div id="step-1" class="screen active">
-            <div class="scan-top">
-                <div class="scan-status">
-                    <div class="red-dot"></div>
-                    <span style="font-size: 12px; font-family: monospace; color: #94a3b8; text-transform: uppercase;">Сканирование</span>
-                </div>
-                <button onclick="toggleFlash()" id="flash-btn" class="flash-btn" type="button">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                </button>
-            </div>
-
-            <div style="margin: auto 0; text-align: center;">
-                <div class="scanner-box">
-                    <div class="corner corner-tl"></div>
-                    <div class="corner corner-tr"></div>
-                    <div class="corner corner-bl"></div>
-                    <div class="corner corner-br"></div>
-                    <div class="scan-laser"></div>
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                </div>
-                <p style="color: #94a3b8; font-size: 14px; margin-top: 24px;">Наведите камеру на QR-код для сканирования</p>
-            </div>
-
-            <button onclick="goToStep(2)" class="btn-green" type="button">
-                <span>Продолжить</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
-        </div>
-
         <!-- ================= ШАГ 2: ВЫБОР СПОСОБА ОПЛАТЫ ================= -->
-        <div id="step-2" class="screen">
+        <div id="step-2" class="screen active">
             <div id="choicePay">
                 <span>
                     <h1 class="user-h1">Выберите способ оплаты:</h1>
@@ -470,12 +315,6 @@
                         </div>
                         <h2 id="textPay">ТБанк</h2>
                     </div>
-                </div>
-
-                <div style="margin-top: 32px; text-align: center;">
-                    <button onclick="goToStep(1)" style="border: none; background: none; color: #94a3b8; font-size: 14px;" type="button">
-                        ← Назад к сканеру
-                    </button>
                 </div>
             </div>
         </div>
@@ -534,10 +373,6 @@
 
         <!-- ================= ШАГ 4: ЧЕК Т-БАНКА ================= -->
         <div id="step-tbank-receipt" class="screen">
-            <div class="tb-header">
-                <div class="tb-badge">Т-БАНК</div>
-            </div>
-
             <div style="flex: 1; overflow-y: auto;">
                 <div class="tb-card-main">
                     <button onclick="goToStep(3)" style="position: absolute; right: 20px; top: 16px; border: none; background: #f1f5f9; width: 32px; height: 32px; border-radius: 50%; font-size: 16px;" type="button">✕</button>
@@ -652,18 +487,13 @@
         function goToStep(stepNumber) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 
-            if (stepNumber === 1) document.getElementById('step-1').classList.add('active');
-            else if (stepNumber === 2) document.getElementById('step-2').classList.add('active');
+            if (stepNumber === 2) document.getElementById('step-2').classList.add('active');
             else if (stepNumber === 3) {
                 document.getElementById('step-3').classList.add('active');
                 updateSelectedBankBadge();
             }
             else if (stepNumber === 'tbank') document.getElementById('step-tbank-receipt').classList.add('active');
             else if (stepNumber === 'sber') document.getElementById('step-sber-receipt').classList.add('active');
-        }
-
-        function toggleFlash() {
-            document.getElementById('flash-btn').classList.toggle('active');
         }
 
         function selectBank(bank) {

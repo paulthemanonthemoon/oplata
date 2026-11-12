@@ -509,7 +509,7 @@
 
                 <div class="field-group">
                     <label>Сумма (₽)</label>
-                    <input type="number" step="0.01" id="input-amount" value="44.00" style="font-size: 20px; font-weight: 700;">
+                    <input type="number" step="0.01" id="input-amount" value="50.00" style="font-size: 20px; font-weight: 700;">
                 </div>
 
                 <div class="grid-2">
@@ -550,7 +550,7 @@
 
                     <div id="tb-display-merchant" style="font-size: 20px; font-weight: 700;">Транспорт</div>
                     <div id="tb-display-category-mcc" style="color: #64748b; font-size: 14px; margin-top: 4px;">🚗 Транспорт • MCC 4111</div>
-                    <div id="tb-display-amount" class="tb-amount">-44,00 ₽</div>
+                    <div id="tb-display-amount" class="tb-amount">-50,00 ₽</div>
                     <div style="color: #94a3b8; font-size: 12px; margin-top: 8px;">⏱ Обрабатываем операцию</div>
                 </div>
 
@@ -603,7 +603,7 @@
 
                 <div class="sber-check">✓</div>
                 <div style="font-size: 12px; font-weight: 700; color: #16a34a; text-transform: uppercase;">Оплата выполнена</div>
-                <div id="sb-display-amount" style="font-size: 32px; font-weight: 800; margin: 8px 0;">44,00 ₽</div>
+                <div id="sb-display-amount" style="font-size: 32px; font-weight: 800; margin: 8px 0;">50,00 ₽</div>
                 <div id="sb-display-merchant" style="font-weight: 600;">Транспорт</div>
                 <div id="sb-display-datetime" style="font-size: 12px; color: #94a3b8; margin-top: 4px;">30 сентября 2026, 19:22</div>
 
@@ -702,7 +702,7 @@
             const merchant = document.getElementById('input-merchant').value || 'Транспорт';
             const category = document.getElementById('input-category').value || 'Транспорт';
             const mcc = document.getElementById('input-mcc').value || '4111';
-            const rawAmount = parseFloat(document.getElementById('input-amount').value || 44);
+            const rawAmount = parseFloat(document.getElementById('input-amount').value || 50);
             const dateVal = document.getElementById('input-date').value;
             const timeVal = document.getElementById('input-time').value || '12:00';
             const cardDigits = document.getElementById('input-card').value || '6449';
